@@ -1,33 +1,37 @@
 import random
 
+#Consum si Costuri pentru investitii, respectiv exploatarea resurselor
+cons_zilnic_apa = 8
+cons_zilnic_energie = 10
+cost_apa = 9
+cost_energie = 12
+
 #Tot codul repetitiv ce poate fi automatizat vine aici
 
 #Contine alegerile posibile pentru user si returneaza alegerea acestuia
 def status_decision(zi, buget, energie, apa):
+    print("\n\n")
     print("==============================")
     print("Ziua " + str(zi))
     print("------------------------------")
     print("Bugetul:  " + str(buget))
     print("Energia:  " + str(energie))
-    print("Apa:      " + str(apa) + '\n')
+    print("Apa:      " + str(apa) + '\n' + '\n')
 
-    optiune = int(input(
-    """Ce decizie iei astăzi?
+    optiune = int(input(f"""Ce decizie iei astăzi?
 
-    [1] Construiești o centrală electrică
-        + Energie
-        - Buget
+    [1] Construiești o centrală electrică (Cost: -{cost_energie} buget)
+        + Energie (impact 3–5 zile echivalent)
+        Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
 
-    [2] Repari rețeaua de apă
-        + Apă
-        - Buget
+    [2] Repari rețeaua de apă (Cost: -{cost_apa} buget)
+        + Apă (impact 3–5 zile echivalent)
+        Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
 
-    [3] Nu iei nicio măsură
-        - Energie
-        - Apă
+    [3] Nu iei nicio măsură (Cost: 0)
+        Doar consumul zilnic se aplică
 
-    Introdu opțiunea (1 / 2 / 3): """
-        ))
+    Introdu opțiunea (1 / 2 / 3): """))
     return optiune
 
 
@@ -38,7 +42,7 @@ def efect(buget, scaderea):
     if(buget - scaderea < 0):
         print(
     """
-    \n
+    \n \n
     Bugetul orașului a fost complet epuizat.
     Lipsa fondurilor a dus la imposibilitatea continuării
     investițiilor esențiale pentru energie și apă.
@@ -48,7 +52,7 @@ def efect(buget, scaderea):
 
     Va rugam sa alegeti alta optiune. Multumim!
 
-    Buget final: """ + str(buget) + '\n'
+    Buget final: """ + str(buget) + '\n' + '\n'
     )
         return False
     return True
@@ -58,7 +62,7 @@ def efectul_investitiei(consum):
     return random.randrange(3, 6) * consum
         
 #Mesajul dupa ce ai ramas fara resurse
-def game_over(buget, energie, apa):
+def game_over(zi, buget, energie, apa):
     print(
         f""" \n
 ==============================
@@ -73,7 +77,7 @@ iar viața urbană nu mai poate continua.
 Deciziile luate de-a lungul zilelor au dus
 orașul într-un punct fără întoarcere.
 
-Ziua finală:
+Ziua finală: {zi}
 Buget final: {buget}
 Energie finală: {energie}
 Apă finală: {apa}
@@ -96,31 +100,23 @@ while(energie > 0 and apa > 0 and buget > 0):
     #Userul decide ce optiune strategica se potriveste pentru orasul sau
     optiune = status_decision(zi, buget, energie, apa)
 
-    #Stabilim cate resurse se folosesc zilnic pentru orasul nostru
-    cons_zilnic_energie = 10
-    cons_zilnic_apa = 8
-
     if(optiune == 1):
 
-        # pretul unei centrale electrice
-        scadere_bani = 12
-
-        if(efect(buget, scadere_bani)== False):
+        if not efect(buget, cost_energie):
             continue
 
-
         #Dupa investitie bugetul scade cu 12 u.m., aceasta fiind suma platita pentru centrala electrica
-        buget = buget - scadere_bani
+        buget = buget - cost_energie
 
         #Energia creste pentru inca 3-5 zile dupa instalarea unei centrale electrice
         crestere_energie = efectul_investitiei(cons_zilnic_energie)
         energie = energie + crestere_energie
-        
-    elif(optiune == 2):
-        #Pretul de investitie pentru apa
-        scadere_bani = 9
 
-        if(efect(buget, scadere_bani) == False):
+        print(f"\n-{cost_energie}: Buget")
+        print(f"+{crestere_energie}: Energie")
+    elif(optiune == 2):
+
+        if not efect(buget, cost_apa):
             continue
 
         #Cresterea apei creste aproximativ de 3-5 * consum zilnic
@@ -128,21 +124,27 @@ while(energie > 0 and apa > 0 and buget > 0):
         apa = apa + crestere_apa
 
         #Scadem din buget costul unei investitii in apa
-        buget = buget - scadere_bani
+        buget = buget - cost_apa
+
+        print(f"\n-{cost_apa}: Buget")
+        print(f"+{crestere_apa}: Apa")
 
     elif (optiune == 3):
         #Nu faci nimic
-        pass
+        print("\nAi ales să nu iei nicio măsură azi.")
 
     else:
-        print("Alege 1, 2 sau 3.")
+        print("\nAlege 1, 2 sau 3.\n")
         continue
-    
+
     #Orasul pierde din resurse la finalul zilei
+
+    print(f"\n-{cons_zilnic_energie}: Energie")
+    print(f"-{cons_zilnic_apa}: Apa")
     energie -= cons_zilnic_energie
     apa -= cons_zilnic_apa
 
     zi = zi + 1
 
 if(buget <= 0 or energie <= 0 or apa <= 0):
-    game_over(buget,energie,apa)
+    game_over(zi,buget,energie,apa)
