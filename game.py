@@ -6,6 +6,11 @@ cons_zilnic_energie = 10
 cost_apa = 9
 cost_energie = 12
 
+#Salarii si Taxe ce ne ajuta la venitul saptamanal(Ideal era lunar, dar dura prea mult pana la salariu, facand jocul imposibil de jucat)
+BONUS_SAPTAMANAL_BAZA = 8
+PRAG_TAXE_ENERGIE = 20
+PRAG_TAXE_APA = 20
+
 #Tot codul repetitiv ce poate fi automatizat vine aici
 
 #Contine alegerile posibile pentru user si returneaza alegerea acestuia
@@ -139,10 +144,20 @@ while(energie > 0 and apa > 0 and buget > 0):
 
     #Orasul pierde din resurse la finalul zilei
 
-    print(f"\n-{cons_zilnic_energie}: Energie")
+    print("\n==========Consumabile===========")
+    print(f"-{cons_zilnic_energie}: Energie")
     print(f"-{cons_zilnic_apa}: Apa")
     energie -= cons_zilnic_energie
     apa -= cons_zilnic_apa
+
+    #Daca e sfarsit de saptamana atunci primim un venit care variaza si nu este constant
+    #prag_taxe_energie/apa inseamna ca o unitate monetara are loc daca ex: energia = 20 si pragul e 20 => +1 u.m
+    if(zi % 7 == 0):
+        taxe = max(0, energie) // PRAG_TAXE_ENERGIE + max(0, apa) // PRAG_TAXE_APA
+        bonus = BONUS_SAPTAMANAL_BAZA + taxe
+        buget += bonus
+        print("\n🏦 ====== Bonus saptamanal ======")
+        print(f"+{bonus}: Buget (baza {BONUS_SAPTAMANAL_BAZA} + taxe {taxe})")
 
     zi = zi + 1
 
