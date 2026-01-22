@@ -59,20 +59,20 @@ def status_decision(zi, buget, energie, apa):
 
     #Ne asiguram ca jocul nu continua aiurea daca cineva apasa "a", 9, etc
     while True:
-        optiune = (input(f"""Ce decizie iei astăzi?
+        optiune = (input(f"""Ce decizie iei astazi?
 
-[1] Construiești o centrală electrică (Cost: -{cost_energie} buget)
+[1] Construiesti o centrala electrica (Cost: -{cost_energie} buget)
     + Energie (impact 3–5 zile echivalent)
-    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
+    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apa
 
-[2] Repari rețeaua de apă (Cost: -{cost_apa} buget)
-    + Apă (impact 3–5 zile echivalent)
-    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
+[2] Repari reteaua de apa (Cost: -{cost_apa} buget)
+    + Apa (impact 3–5 zile echivalent)
+    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apa
 
-[3] Nu iei nicio măsură (Cost: 0)
-    Doar consumul zilnic se aplică
+[3] Nu iei nicio masura (Cost: 0)
+    Doar consumul zilnic se aplica
 
-Introdu opțiunea (1 / 2 / 3): """))
+Introdu optiunea (1 / 2 / 3): """))
         if optiune in ['1', '2', '3']:
             return optiune
         print("❌ Optiune invalida. Alege 1, 2 sau 3.")
@@ -85,12 +85,12 @@ def efect(buget, scaderea):
         print(
     """
     \n \n
-    Bugetul orașului a fost complet epuizat.
-    Lipsa fondurilor a dus la imposibilitatea continuării
-    investițiilor esențiale pentru energie și apă.
+    Bugetul orasului a fost complet epuizat.
+    Lipsa fondurilor a dus la imposibilitatea continuarii
+    investitiilor esentiale pentru energie si apa.
 
-    Orașul a ajuns într-un punct fără întoarcere,
-    iar administrația este nevoită să își înceteze activitatea.
+    Orasul a ajuns intr-un punct fara intoarcere,
+    iar administratia este nevoita sa isi inceteze activitatea.
 
     Va rugam sa alegeti alta optiune. Multumim!
 
@@ -110,28 +110,30 @@ f"""==============================
         GAME OVER
 ==============================
 
-Resursele orașului au fost complet epuizate.
+Resursele orasului au fost complet epuizate.
 
-Fără energie și apă, infrastructura s-a prăbușit,
-iar viața urbană nu mai poate continua.
+Fara energie si apa, infrastructura s-a prabusit,
+iar viata urbana nu mai poate continua.
 
 Deciziile luate de-a lungul zilelor au dus
-orașul într-un punct fără întoarcere.
+orasul intr-un punct fara intoarcere.
 
-Ziua finală: {zi}
+Ziua finala: {zi}
 Buget final: {buget}
-Energie finală: {energie}
-Apă finală: {apa}
+Energie finala: {energie}
+Apa finala: {apa}
 
-Administrația orașului își încheie mandatul.\n"""
+Administratia orasului isi incheie mandatul.\n"""
     )
 
+#Pentru a putea observa ce schimbari au avut loc inainte de urmatoarea zi
 def pauza():
     input("\n Apasa ENTER ca sa continui...")
 
+
 def AI_Predictor(buget, energie, apa):
 
-    #Logica: „Dacă aleg X azi, cât de riscant e pe termen scurt?”
+    #Logica: „Daca aleg X azi, cat de riscant e pe termen scurt?”
     valori = ['1', '2', '3']
     
     scor_riscuri = {
@@ -156,6 +158,7 @@ def AI_Predictor(buget, energie, apa):
         apa_sim = apa0
         energie_sim = energie0
 
+        #Nu putem sa investim fara bugetul necesar
         if(decizie == '1' and (buget_sim < cost_energie)):
             riscul = "IMPOSIBIL"
             riscuri[decizie] = riscul
@@ -177,7 +180,7 @@ def AI_Predictor(buget, energie, apa):
         energie_sim = energie_sim - 3 * cons_zilnic_energie
         apa_sim = apa_sim - 3 * cons_zilnic_apa
 
-        #Stabilim ce fel de risc avem
+        #Daca peste 3 zile urmeaza ca una dintre resurse sa se epuizeze, reprezinta un risc critic
         riscul = ""
         if(energie_sim <= 0 or apa_sim <= 0 or buget_sim <= 0):
             riscul = "Critic"
@@ -196,7 +199,7 @@ def AI_Predictor(buget, energie, apa):
         
         riscuri[decizie] = riscul
         
-        
+        #Decizia cu cel mai mic risc va fi afisata drept sugestie pe ecranul userului
         if(scor_riscuri[riscuri[decizie]] < BEST_CASE_VALUE): 
             BEST_CASE_VALUE = scor_riscuri[riscuri[decizie]]
             BEST_CASE_SCENARIO = decizie
@@ -211,7 +214,7 @@ def zile_supravietuire(energie, apa):
 
     return zE, zA, zMin
 
-#Clasificam Starea Orasului
+#Clasificam starea orasului in functie de zilele minime ramase (zMin)
 def get_city_state(zMin):
     stare = ""
     if(zMin <= 1):
@@ -223,6 +226,7 @@ def get_city_state(zMin):
     else:
         stare = "STABIL"
     return stare
+
 
 def AI_Strategist(buget, energie, apa):
 
@@ -263,12 +267,10 @@ def AI_Strategist(buget, energie, apa):
 
 #PROGRAM
 
-#Initializam Resursele
 buget = 35
 energie = 50
 apa = 45
 
-#Tinem cont de ziua in care ne aflam stabilind progresul orasului
 zi = 1
 
 while(energie > 0 and apa > 0 and buget > 0):
@@ -292,6 +294,7 @@ while(energie > 0 and apa > 0 and buget > 0):
     optiune = status_decision(zi, buget, energie, apa)
     if(optiune == "1"):
 
+        #Verificam daca avem banii necesari pentru a investi
         if not efect(buget, cost_energie):
             continue
 
@@ -321,7 +324,7 @@ while(energie > 0 and apa > 0 and buget > 0):
 
     elif (optiune == "3"):
         #Nu faci nimic
-        print("\nAi ales să nu iei nicio măsură azi.")
+        print("\nAi ales sa nu iei nicio masura azi.")
 
     else:
         print("\nAlege 1, 2 sau 3.\n")
