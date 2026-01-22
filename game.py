@@ -90,6 +90,9 @@ Apă finală: {apa}
 Administrația orașului își încheie mandatul.\n"""
     )
 
+def pauza():
+    input("\n Apasa ENTER ca sa continui...")
+
 
 #Initializam Resursele
 buget = 35
@@ -144,7 +147,7 @@ while(energie > 0 and apa > 0 and buget > 0):
 
     #Orasul pierde din resurse la finalul zilei
 
-    print("\n==========Consumabile===========")
+    print("\n==========Consumabile===========\n")
     print(f"-{cons_zilnic_energie}: Energie")
     print(f"-{cons_zilnic_apa}: Apa")
     energie -= cons_zilnic_energie
@@ -159,6 +162,10 @@ while(energie > 0 and apa > 0 and buget > 0):
         print("\n🏦 ====== Bonus saptamanal ======")
         print(f"+{bonus}: Buget (baza {BONUS_SAPTAMANAL_BAZA} + taxe {taxe})")
 
+    #Vrem ca userul sa aiba timp sa citeasca update-urile fara sa sara la ziua urmatoare
+    pauza()
+
+    #Trecem la ziua urmatoare
     zi = zi + 1
 
 if(buget <= 0 or energie <= 0 or apa <= 0):
