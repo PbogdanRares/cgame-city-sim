@@ -1,5 +1,16 @@
 import random
 
+#Culori
+RESET = "\033[0m"
+
+RED    = "\033[91m"
+GREEN  = "\033[92m"
+YELLOW = "\033[93m"
+BLUE   = "\033[94m"
+CYAN   = "\033[96m"
+BOLD   = "\033[1m"
+
+
 #Consum si Costuri pentru investitii, respectiv exploatarea resurselor
 cons_zilnic_apa = 8
 cons_zilnic_energie = 10
@@ -13,6 +24,29 @@ PRAG_TAXE_APA = 20
 
 #Tot codul repetitiv ce poate fi automatizat vine aici
 
+#FUNCTII CULORI
+def color_risk(risc):
+    if(risc == "Mic"):
+        return GREEN + risc + RESET
+    elif(risc == "Mediu"):
+        return YELLOW + risc + RESET
+    elif(risc == "Mare"):
+        return RED + risc + RESET
+    elif(risc == "Critic"):
+        return BOLD + RED + risc + RESET
+    else:
+        return BOLD + RED + risc + RESET
+    
+def color_state(stare):
+    if(stare == "STABIL"):
+        return GREEN + stare + RESET
+    elif(stare == "INSTABIL"):
+        return YELLOW + stare + RESET
+    elif(stare == "FRAGIL"):
+        return RED + stare + RESET
+    else:
+        return BOLD + RED + stare + RESET
+
 #Contine alegerile posibile pentru user si returneaza alegerea acestuia
 def status_decision(zi, buget, energie, apa):
     print("\n\n")
@@ -23,22 +57,25 @@ def status_decision(zi, buget, energie, apa):
     print("Energia:  " + str(energie))
     print("Apa:      " + str(apa) + '\n' + '\n')
 
-    optiune = (input(f"""Ce decizie iei astăzi?
+    #Ne asiguram ca jocul nu continua aiurea daca cineva apasa "a", 9, etc
+    while True:
+        optiune = (input(f"""Ce decizie iei astăzi?
 
-    [1] Construiești o centrală electrică (Cost: -{cost_energie} buget)
-        + Energie (impact 3–5 zile echivalent)
-        Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
+[1] Construiești o centrală electrică (Cost: -{cost_energie} buget)
+    + Energie (impact 3–5 zile echivalent)
+    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
 
-    [2] Repari rețeaua de apă (Cost: -{cost_apa} buget)
-        + Apă (impact 3–5 zile echivalent)
-        Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
+[2] Repari rețeaua de apă (Cost: -{cost_apa} buget)
+    + Apă (impact 3–5 zile echivalent)
+    Consum zilnic: -{cons_zilnic_energie} energie, -{cons_zilnic_apa} apă
 
-    [3] Nu iei nicio măsură (Cost: 0)
-        Doar consumul zilnic se aplică
+[3] Nu iei nicio măsură (Cost: 0)
+    Doar consumul zilnic se aplică
 
-    Introdu opțiunea (1 / 2 / 3): """))
-    return optiune
-
+Introdu opțiunea (1 / 2 / 3): """))
+        if optiune in ['1', '2', '3']:
+            return optiune
+        print("❌ Optiune invalida. Alege 1, 2 sau 3.")
 
 #Observam daca user-ul are banii necesari pentru o noua investitie
 def efect(buget, scaderea):
@@ -239,14 +276,16 @@ while(energie > 0 and apa > 0 and buget > 0):
     #Propunerea robotului pentru o decizie eficienta din punct de vedere economic
     stare, strategie, actiune_ai, riscuri = AI_Strategist(buget, energie, apa)
     print("\n🧠 AI Strategic Analysis")
-    print(f"Stare oras: {stare}")
-    print(f"Strategie: {strategie}")
-    print(f"Recomandare AI azi: Optiunea {actiune_ai}\n")
+    print(f"Stare oras: {color_state(stare)}")
+    print(f"Strategie: {CYAN}{strategie}{RESET}")
+    print(f"Recomandare AI: {BOLD}{GREEN}Optiunea {actiune_ai}{RESET}")
+
 
     print("\n🤖 ====== AI Predictor (forecast 3 zile) ======")
-    print(f"Optiunea 1: {riscuri.get('1')}")
-    print(f"Optiunea 2: {riscuri.get('2')}")
-    print(f"Optiunea 3: {riscuri.get('3')}")
+    print(f"Optiunea 1: {color_risk(riscuri.get('1'))}")
+    print(f"Optiunea 2: {color_risk(riscuri.get('2'))}")
+    print(f"Optiunea 3: {color_risk(riscuri.get('3'))}")
+
 
     #Afisam situatia actuala a orasului
     #Userul decide ce optiune strategica se potriveste pentru orasul sau
