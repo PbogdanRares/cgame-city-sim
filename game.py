@@ -93,7 +93,7 @@ def pauza():
     input("\n Apasa ENTER ca sa continui...")
 
 def AI_Predictor(buget, energie, apa):
-    
+
     #Logica: „Dacă aleg X azi, cât de riscant e pe termen scurt?”
     valori = ['1', '2', '3']
     
@@ -145,6 +145,7 @@ def AI_Predictor(buget, energie, apa):
         if(energie_sim <= 0 or apa_sim <= 0 or buget_sim <= 0):
             riscul = "Critic"
         else:
+            #Calculam cate zile mai poate rezista orasul fara investitii
             zE = energie_sim // cons_zilnic_energie
             zA = apa_sim // cons_zilnic_apa
             zMin = min(zE, zA)
@@ -164,6 +165,67 @@ def AI_Predictor(buget, energie, apa):
             BEST_CASE_SCENARIO = decizie
 
     return riscuri, BEST_CASE_SCENARIO
+
+#Cate zile de supravietuire mai avem pornind din situatia curenta
+def zile_supravietuire(energie, apa):
+    zE = energie // cons_zilnic_energie
+    zA = apa // cons_zilnic_apa
+    zMin = min(zE, zA)
+
+    return zE, zA, zMin
+
+#Clasificam Starea Orasului
+def get_city_state(zMin):
+    stare = ""
+    if(zMin <= 1):
+        stare = "CRITIC"
+    elif(zMin <= 3):
+        stare = "FRAGIL"
+    elif(zMin <= 6):
+        stare = "INSTABIL"
+    else:
+        stare = "STABIL"
+    return stare
+
+def AI_Strategist(buget, energie, apa):
+
+   #Ce strategie trebuie sa abordeze user-ul in functie de starea orasului
+    strategii = {
+        "CRITIC": "Supravietuire",
+        "FRAGIL": "Stabilizare",
+        "INSTABIL": "Consolidare",
+        "STABIL": "Expansiune controlata"
+    }
+
+    #Calculam zilele de supravietuire
+    zE,zA,zMin = zile_supravietuire(energie, apa)
+
+    #Determinam starea orasului
+    stare = get_city_state(zMin)
+
+    #Determinam Strategia
+    strategie = strategii[stare]
+
+    #Folosim AI-ul initial ca un tactician
+    riscuri, best_option = AI_Predictor(buget, energie, apa)
+
+    #Daca ne aflam intr-o situatie critica = supravietuire (trebuie sa investim)
+
+    if(stare == "CRITIC"):
+        if(energie < apa):
+            actiune_finala = '1'
+        elif(energie > apa):
+            actiune_finala = '2'
+        else:
+            actiune_finala = best_option
+    else:
+        actiune_finala = best_option
+
+    #Returnam doar analiza
+    return stare, strategie, actiune_finala, riscuri
+
+#PROGRAM
+
 #Initializam Resursele
 buget = 35
 energie = 50
@@ -174,18 +236,17 @@ zi = 1
 
 while(energie > 0 and apa > 0 and buget > 0):
 
-    
-    riscuri, best = AI_Predictor(buget, energie, apa)
+    #Propunerea robotului pentru o decizie eficienta din punct de vedere economic
+    stare, strategie, actiune_ai, riscuri = AI_Strategist(buget, energie, apa)
+    print("\n🧠 AI Strategic Analysis")
+    print(f"Stare oras: {stare}")
+    print(f"Strategie: {strategie}")
+    print(f"Recomandare AI azi: Optiunea {actiune_ai}\n")
+
     print("\n🤖 ====== AI Predictor (forecast 3 zile) ======")
     print(f"Optiunea 1: {riscuri.get('1')}")
     print(f"Optiunea 2: {riscuri.get('2')}")
     print(f"Optiunea 3: {riscuri.get('3')}")
-
-    if best != "":
-        print(f"✅ AI recomanda: Optiunea {best} (risc minim)")
-
-    else:
-        print("⚠️ AI: Nicio optiune valida (buget prea mic pentru investitii)")
 
     #Afisam situatia actuala a orasului
     #Userul decide ce optiune strategica se potriveste pentru orasul sau
